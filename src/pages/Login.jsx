@@ -45,7 +45,7 @@ export default function Login() {
   }
 
   return (
-    <div>
+    <div className='bg-zinc-900 text-yellow-50 w-full h-screen'>
       <form onSubmit={onSubmit}>
         <label htmlFor='email'>
           Email
