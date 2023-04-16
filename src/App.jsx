@@ -1,8 +1,18 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import Login from './pages/Login';
+import Todos from './pages/Todos';
+
 function App() {
   return (
-    <div>
-      <h1>Hello World</h1>
-    </div>
+    <>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Login />} />
+          <Route path='/todos' element={<Todos />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 
