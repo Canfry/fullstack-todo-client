@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,7 +25,9 @@ export default function Login() {
       const response = await axios.post(url, userData);
 
       if (response.data) {
-        localStorage.setItem('token', JSON.stringify(response.data.token));
+        localStorage.setItem('user', JSON.stringify(response.data));
+        const token = response.data.token;
+        return token;
       }
     } catch (error) {
       console.error(error);
@@ -34,6 +37,11 @@ export default function Login() {
   function onSubmit(e) {
     e.preventDefault();
     login();
+    setIsLoading(true);
+    if (isLoading) {
+      return <h1>Loading...</h1>;
+    }
+    setIsLoading(false);
     navigate('/todos');
   }
 
