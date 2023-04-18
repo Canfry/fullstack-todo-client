@@ -35,27 +35,24 @@ export default function Todos() {
     }
   }
 
+  const newTodo = {
+    description,
+    status,
+    user: userData._id,
+  };
+
   async function createTodo() {
     try {
-      const taskData = {
-        description,
-        status,
-        user: userData._id,
-      };
-
       const response = await axios.post(url, {
         headers: {
           Authorization: `Bearer ${userData.token}`,
         },
-        data: {
-          taskData,
-        },
+        newTodo,
       });
-      if (userData._id === todos.user) {
-        setTodos([...todos, taskData]);
-      }
+
+      setTodos([...todos, newTodo]);
+      return response.data.newTodo;
       console.log(response.data);
-      return response.data;
     } catch (error) {
       console.error(error);
     }
