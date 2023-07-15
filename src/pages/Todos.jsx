@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import TodosList from '../components/TodosList';
@@ -18,6 +18,8 @@ export default function Todos() {
   const userData = JSON.parse(localStorage.getItem('user'));
   console.log(userData);
 
+  const user = userData._id;
+
   async function getTodos() {
     try {
       const response = await axios.get(url, {
@@ -28,31 +30,33 @@ export default function Todos() {
       console.log(response.data);
       setTodos(response.data);
       setIsLoading(false);
-
-      return todos;
     } catch (error) {
       console.error(error);
     }
   }
 
-  const newTodo = {
-    description,
-    status,
-    user: userData._id,
-  };
-
   async function createTodo() {
+    const newTodo = {
+      description,
+      status,
+    };
     try {
-      const response = await axios.post(url, {
-        headers: {
-          Authorization: `Bearer ${userData.token}`,
-        },
-        newTodo,
-      });
-
-      setTodos([...todos, newTodo]);
-      return response.data.newTodo;
-      console.log(response.data);
+      if (userData.token) {
+        const response = await axios.post(url, newTodo, {
+          headers: {
+            Authorization: `Bearer ${userData.token}`,
+          },
+        });
+        console.log(response.data);
+        setTodos([...todos, newTodo]);
+        setFormData({
+          description: '',
+          status: '',
+        });
+        if (response.data) {
+          getTodos();
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -66,6 +70,7 @@ export default function Todos() {
   function formSubmit(e) {
     e.preventDefault();
     createTodo();
+    // getTodos();
   }
 
   function handleChange(e) {
@@ -79,7 +84,7 @@ export default function Todos() {
     <>
       <Header />
       <div className='h-screen w-full bg-zinc-900 text-yellow-50 pt-10'>
-        <div className='h-full max-w-[80%] m-auto'>
+        <div className='h-full max-w-[80%] lg:max-w-[60%] m-auto'>
           <form className='flex items-center gap-8' onSubmit={formSubmit}>
             <input
               type='text'

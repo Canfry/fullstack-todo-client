@@ -1,8 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Header() {
+  const navigate = useNavigate();
+
+  function logout() {
+    localStorage.clear();
+    navigate('/login');
+  }
   return (
-    <div className='navbar bg-zinc-900 text-yellow-50 max-w-[80%] m-auto py-8'>
+    <div className='navbar bg-zinc-900 text-yellow-50 max-w-[80%] lg:max-w-[60%] m-auto py-8'>
       <div className='flex-1 p-0'>
         <Link to='/' className='text-2xl'>
           FRYTASKS
@@ -49,7 +55,7 @@ export default function Header() {
               <a>Settings</a>
             </li>
             <li>
-              <a>Logout</a>
+              <button onClick={logout}>Logout</button>
             </li>
           </ul>
         </div>
