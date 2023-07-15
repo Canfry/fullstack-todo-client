@@ -16,9 +16,6 @@ export default function Todos() {
   const url = `${import.meta.env.VITE_BASE_URL}/api/todos`;
 
   const userData = JSON.parse(localStorage.getItem('user'));
-  console.log(userData);
-
-  const user = userData._id;
 
   async function getTodos() {
     try {
@@ -27,11 +24,10 @@ export default function Todos() {
           Authorization: `Bearer ${userData.token}`,
         },
       });
-      console.log(response.data);
       setTodos(response.data);
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      throw new Error(error);
     }
   }
 
@@ -47,7 +43,6 @@ export default function Todos() {
             Authorization: `Bearer ${userData.token}`,
           },
         });
-        console.log(response.data);
         setTodos([...todos, newTodo]);
         setFormData({
           description: '',
@@ -58,7 +53,7 @@ export default function Todos() {
         }
       }
     } catch (error) {
-      console.error(error);
+      throw new Error(error);
     }
   }
 

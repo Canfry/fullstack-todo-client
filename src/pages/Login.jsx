@@ -25,15 +25,15 @@ export default function Login() {
   const login = async () => {
     try {
       const response = await axios.post(url, userData);
-
       if (response.data) {
         localStorage.setItem('user', JSON.stringify(response.data));
-        const token = response.data.token;
+        const token = response?.data?.token;
+        setFormData(userData);
         navigate('/todos');
         return token;
       }
     } catch (error) {
-      console.error(error);
+      throw new Error(error);
     }
   };
 
