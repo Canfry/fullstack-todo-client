@@ -105,6 +105,7 @@ export default function Todos() {
 
   useEffect(() => {
     getTodos();
+    console.log(todos);
   }, []);
 
   function formSubmit(e) {
