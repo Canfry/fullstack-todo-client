@@ -18,6 +18,7 @@ export default function Todos() {
 
   const userData = JSON.parse(localStorage.getItem('user'));
 
+  // Add useCallback here
   async function getTodos() {
     setIsLoading(true);
     try {
@@ -45,12 +46,13 @@ export default function Todos() {
             Authorization: `Bearer ${userData.token}`,
           },
         });
-        setTodos([...todos, newTodo]);
-        setFormData({
-          description: '',
-          status: '',
-        });
+
         if (response.data) {
+          setTodos([...todos, newTodo]);
+          setFormData({
+            description: '',
+            status: '',
+          });
           getTodos();
         }
       }
@@ -85,7 +87,6 @@ export default function Todos() {
   }
 
   async function deleteTodo(todoId) {
-    setIsLoading(true);
     try {
       const response = await axios.delete(`${url}/${todoId}`, {
         headers: {
@@ -94,8 +95,8 @@ export default function Todos() {
       });
       if (response.data) {
         setTodos((prevState) => prevState.filter((t) => t._id !== todoId));
+
         getTodos();
-        setIsLoading(false);
       }
     } catch (error) {
       setIsError(error);
