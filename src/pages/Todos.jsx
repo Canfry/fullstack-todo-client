@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import TodosList from '../components/TodosList';
@@ -6,6 +6,7 @@ import TodosList from '../components/TodosList';
 export default function Todos() {
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState();
   const [formData, setFormData] = useState({
     description: '',
     status: '',
@@ -18,6 +19,7 @@ export default function Todos() {
   const userData = JSON.parse(localStorage.getItem('user'));
 
   async function getTodos() {
+    setIsLoading(true);
     try {
       const response = await axios.get(url, {
         headers: {
@@ -25,10 +27,10 @@ export default function Todos() {
         },
       });
       setTodos(response.data);
-      setIsLoading(false);
     } catch (error) {
-      throw new Error(error);
+      setIsError(error);
     }
+    setIsLoading(false);
   }
 
   async function createTodo() {
@@ -57,9 +59,52 @@ export default function Todos() {
     }
   }
 
+  async function updateTodo(todoId, data) {
+    setIsLoading(true);
+    try {
+      const response = await axios.put(`${url}/${todoId}`, data, {
+        headers: {
+          Authorization: `Bearer ${userData.token}`,
+        },
+        method: 'PUT',
+      });
+      if (response.data) {
+        setTodos((prevState) =>
+          prevState.map((t) => {
+            if (t._id === todoId) {
+              return data;
+            }
+            return t;
+          })
+        );
+      }
+    } catch (error) {
+      setIsError(error);
+    }
+    setIsLoading(false);
+  }
+
+  async function deleteTodo(todoId) {
+    setIsLoading(true);
+    try {
+      const response = await axios.delete(`${url}/${todoId}`, {
+        headers: {
+          Authorization: `Bearer ${userData.token}`,
+        },
+      });
+      if (response.data) {
+        setTodos((prevState) => prevState.filter((t) => t._id !== todoId));
+        getTodos();
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsError(error);
+    }
+    setIsLoading(false);
+  }
+
   useEffect(() => {
     getTodos();
-    setIsLoading(true);
   }, []);
 
   function formSubmit(e) {
@@ -74,6 +119,10 @@ export default function Todos() {
       [e.target.name]: e.target.value,
     }));
   }
+
+  if (isLoading) return <h1>Loading...</h1>;
+
+  if (isError) return <h1>Something went wrong...</h1>;
 
   return (
     <>
@@ -96,9 +145,7 @@ export default function Todos() {
               className='bg-yellow-50 py-1 px-2 text-zinc-900 rounded-md'
               onChange={handleChange}
             >
-              <option value='Status' selected>
-                Status
-              </option>
+              <option value='Status'>Status</option>
               <option value='---' disabled>
                 -----
               </option>
@@ -114,7 +161,14 @@ export default function Todos() {
           {isLoading ? (
             <h1>Loading...</h1>
           ) : (
-            todos.map((todo) => <TodosList key={todo._id} todo={todo} />)
+            todos.map((todo) => (
+              <TodosList
+                key={todo._id}
+                todo={todo}
+                deleteTodo={deleteTodo}
+                updateTodo={updateTodo}
+              />
+            ))
           )}
         </div>
       </div>

@@ -27,10 +27,10 @@ export default function Login() {
       const response = await axios.post(url, userData);
       if (response.data) {
         localStorage.setItem('user', JSON.stringify(response.data));
-        const token = response?.data?.token;
+        // const token = response?.data?.token;
         setFormData(userData);
         navigate('/todos');
-        return token;
+        // return token;
       }
     } catch (error) {
       throw new Error(error);
